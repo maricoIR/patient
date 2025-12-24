@@ -44,6 +44,12 @@ import PlasmicRateAndCommentCount from '.plasmic/plasmic/ravi_r_r/PlasmicRateAnd
 
 const { publicRuntimeConfig } = config();
 
+const normalizeImageUrl = (image?: string) => {
+  if (!image) return undefined;
+  if (/^https?:\/\//i.test(image)) return image;
+  return publicRuntimeConfig.CDN_BASE_URL + image;
+};
+
 const DoctorProfile = (props: any) => {
   const { shouldFetchOnClient, slug: initialSlug, status } = props;
   const { query, ...router } = useRouter();
@@ -348,9 +354,8 @@ const DoctorProfile = (props: any) => {
                     displayName: profileData.information.display_name,
                     title: information?.experience ? `${profileData.information?.experience} سال تجربه` : undefined,
                     subTitle: `شماره نظام پزشکی: ${profileData.information?.employee_id}`,
-                    imageUrl: profileData.information?.image
-                      ? publicRuntimeConfig.CDN_BASE_URL + profileData.information?.image
-                      : `https://cdn.paziresh24.com/getImage/p24/search-men/noimage.png`,
+                    imageUrl:
+                      normalizeImageUrl(profileData.information?.image) ?? `https://cdn.paziresh24.com/getImage/p24/search-men/noimage.png`,
                     slug: slug,
                     children: (
                       <div className="flex flex-col w-full gap-2">
@@ -507,7 +512,7 @@ DoctorProfile.getLayout = function getLayout(page: ReactElement) {
         expertises?.group_expertises?.[0]?.name ? `${information?.display_name} ${expertises.group_expertises[0].name}` : null,
       ].filter(Boolean),
       'gender': information?.gender === '1' ? 'Male' : information?.gender === '2' ? 'Female' : undefined,
-      'image': publicRuntimeConfig.CDN_BASE_URL + information?.image,
+      'image': normalizeImageUrl(information?.image) ?? `https://cdn.paziresh24.com/getImage/p24/search-men/noimage.png`,
       'medicalSpecialty': {
         '@type': 'MedicalSpecialty',
         'name': expertises?.expertises?.[0]?.alias_title || expertises?.group_expertises?.[0]?.name || doctorExpertise,
@@ -635,7 +640,7 @@ DoctorProfile.getLayout = function getLayout(page: ReactElement) {
         jsonlds={centers?.length > 0 ? getJsonlds() : []}
         openGraph={{
           image: {
-            src: publicRuntimeConfig.CDN_BASE_URL + information?.image,
+            src: normalizeImageUrl(information?.image) ?? `https://cdn.paziresh24.com/getImage/p24/search-men/noimage.png`,
             alt: `${information?.display_name}`,
             type: 'image/jpg',
           },
